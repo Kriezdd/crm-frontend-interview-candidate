@@ -1,0 +1,13 @@
+body { margin: 0; background: #f2f5f8; }
+* { box-sizing: border-box; }
+.tickets-page { max-width: 1600px; margin: auto; padding: 32px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.ticket-filters { display: grid; grid-template-columns: minmax(200px, 2fr) minmax(150px, 1fr) minmax(200px, 1fr) auto; gap: 16px; align-items: end; margin-top: 24px; }
+.tickets-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); gap: 24px; align-items: start; }
+.tickets-layout > * { min-width: 0; }
+.ticket-selected > td { background: #edf3ff !important; }
+.ticket-link { padding: 0; white-space: normal; height: auto; text-align: left; }
+.load-more { display: flex; align-items: center; flex-direction: column; gap: 8px; padding-top: 20px; }
+.demo-controls { margin-top: 24px; }
+@media (max-width: 1100px) { .tickets-layout { grid-template-columns: 1fr; } .ticket-filters { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .tickets-page { padding: 16px; } .ticket-filters { grid-template-columns: 1fr; } .page-header { align-items: start; flex-direction: column; } }
