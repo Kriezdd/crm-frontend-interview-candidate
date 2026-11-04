@@ -17,7 +17,9 @@ export const employees: Employee[] = [
   { id: 'olga', name: 'Ольга Смирнова' },
 ];
 export const statusLabels: Record<Status, string> = {
-  new: 'Новая', active: 'В работе', closed: 'Закрыта',
+  new: 'Новая',
+  active: 'В работе',
+  closed: 'Закрыта',
 };
 export const emptyFilters: Filters = { q: '', status: '', assigneeId: '' };
 
@@ -28,7 +30,11 @@ export class ApiError extends Error {
     status: number,
     message: string,
     fieldErrors: Partial<Record<keyof TicketPatch, string>> = {},
-  ) { super(message); this.status = status; this.fieldErrors = fieldErrors; }
+  ) {
+    super(message);
+    this.status = status;
+    this.fieldErrors = fieldErrors;
+  }
 }
 
 const statuses: Status[] = ['new', 'active', 'closed'];
@@ -37,11 +43,14 @@ const customers = ['Север', 'Маяк', 'Вектор', 'Орбита', 'С
 
 // Создаётся отдельно для изоляции тестов. В приложении используйте экспорт api.
 export function createApi(latency = 350) {
-  const seed = (): Ticket[] => Array.from({ length: 84 }, (_, i) => ({
-    id: String(i + 1), title: `${titles[i % titles.length]} №${i + 1}`,
-    customer: customers[i % customers.length], status: statuses[i % 3],
-    assigneeId: employees[Math.floor(i / 3) % employees.length].id,
-  }));
+  const seed = (): Ticket[] =>
+    Array.from({ length: 84 }, (_, i) => ({
+      id: String(i + 1),
+      title: `${titles[i % titles.length]} №${i + 1}`,
+      customer: customers[i % customers.length],
+      status: statuses[i % 3],
+      assigneeId: employees[Math.floor(i / 3) % employees.length].id,
+    }));
   let rows = seed();
   let failNext = false;
   const pause = async (signal?: AbortSignal) => {
@@ -54,13 +63,18 @@ export function createApi(latency = 350) {
     }
   };
   return {
-    async list(filters: Filters, cursor: string | null = null, signal?: AbortSignal): Promise<Page> {
+    async list(
+      filters: Filters,
+      cursor: string | null = null,
+      signal?: AbortSignal,
+    ): Promise<Page> {
       await pause(signal);
       const q = filters.q.trim().toLocaleLowerCase();
-      const matching = rows.filter((row) =>
-        (!q || `${row.title} ${row.customer}`.toLocaleLowerCase().includes(q)) &&
-        (!filters.status || row.status === filters.status) &&
-        (!filters.assigneeId || row.assigneeId === filters.assigneeId),
+      const matching = rows.filter(
+        (row) =>
+          (!q || `${row.title} ${row.customer}`.toLocaleLowerCase().includes(q)) &&
+          (!filters.status || row.status === filters.status) &&
+          (!filters.assigneeId || row.assigneeId === filters.assigneeId),
       );
       const offset = cursor === null ? 0 : Number(cursor);
       if (!Number.isInteger(offset) || offset < 0) throw new ApiError(400, 'Некорректный курсор');
@@ -82,7 +96,8 @@ export function createApi(latency = 350) {
       const ticket = rows.find((row) => row.id === id);
       if (!ticket) throw new ApiError(404, 'Заявка не найдена');
       const errors: Partial<Record<keyof TicketPatch, string>> = {};
-      if (!employees.some((employee) => employee.id === patch.assigneeId)) errors.assigneeId = 'Выберите сотрудника';
+      if (!employees.some((employee) => employee.id === patch.assigneeId))
+        errors.assigneeId = 'Выберите сотрудника';
       if (!statuses.includes(patch.status)) errors.status = 'Выберите статус';
       if (patch.status === 'closed' && patch.assigneeId === 'max') {
         errors.assigneeId = 'Максим не может принимать закрытые заявки';
@@ -91,8 +106,13 @@ export function createApi(latency = 350) {
       Object.assign(ticket, patch);
       return { ...ticket };
     },
-    failNextRequest() { failNext = true; },
-    reset() { rows = seed(); failNext = false; },
+    failNextRequest() {
+      failNext = true;
+    },
+    reset() {
+      rows = seed();
+      failNext = false;
+    },
   };
 }
 

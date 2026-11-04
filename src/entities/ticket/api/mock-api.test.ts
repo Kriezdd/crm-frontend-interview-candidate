@@ -18,8 +18,11 @@ test('pagination returns all records once and stops', async () => {
 test('validation preserves data; successful update changes filtered membership', async () => {
   const api = createApi(0);
   const original = await api.get('1');
-  await assert.rejects(api.update('1', { status: 'closed', assigneeId: 'max' }),
-    (error: unknown) => error instanceof ApiError && error.status === 422 && Boolean(error.fieldErrors.assigneeId));
+  await assert.rejects(
+    api.update('1', { status: 'closed', assigneeId: 'max' }),
+    (error: unknown) =>
+      error instanceof ApiError && error.status === 422 && Boolean(error.fieldErrors.assigneeId),
+  );
   assert.deepEqual(await api.get('1'), original);
   await api.update('1', { status: 'active', assigneeId: 'olga' });
   const page = await api.list({ ...emptyFilters, status: 'new' });
@@ -32,9 +35,14 @@ test('search, transient errors and cancellation follow the contract', async () =
   const api = createApi(0);
   const page = await api.list({ ...emptyFilters, q: '  ДОГОВОР ', assigneeId: 'anna' });
   assert.ok(page.total > 0);
-  assert.ok(page.items.every((ticket) => ticket.title.includes('договор') && ticket.assigneeId === 'anna'));
+  assert.ok(
+    page.items.every((ticket) => ticket.title.includes('договор') && ticket.assigneeId === 'anna'),
+  );
   api.failNextRequest();
-  await assert.rejects(api.get('1'), (error: unknown) => error instanceof ApiError && error.status === 503);
+  await assert.rejects(
+    api.get('1'),
+    (error: unknown) => error instanceof ApiError && error.status === 503,
+  );
   assert.equal((await api.get('1')).id, '1');
   const controller = new AbortController();
   controller.abort();
